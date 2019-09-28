@@ -1,0 +1,425 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Diagnostics;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace A3_StudentScores_MackenzieHampel
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        private int numberOfStudents;
+        private int numberOfAssignments;
+        private String[] studentArray;
+        private int indexOfCurrStudentDisplaying = 0;
+        private int[,] assignmentArray;
+
+
+        public MainWindow()
+        {
+            
+            InitializeComponent();
+            fieldsAreEnabled(false);
+            richTextBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+        }
+
+        /// <summary>
+        /// Function determines if Number of Students is between 1 and 10 and if number of Assignments is between 1 and 99
+        ///
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void didClickSubmitCountsButton(object sender, RoutedEventArgs e)
+        {
+           // txtBlkWarning.Text = "Number of students has to be between 1 and 10";
+            txtBlkWarning.Visibility = Visibility.Hidden;
+            bool numberOfStudentsIsSet = false;
+           
+            //TODO Check for no input?
+            int res;
+            if (Int32.TryParse(txtbxNumbStudents.Text, out res) == true)
+            {
+                if (res > 0 && res <= 10)
+                {
+                    numberOfStudents = res;
+                    numberOfStudentsIsSet = true;
+                }
+                else
+                {
+                    txtBlkWarning.Visibility = Visibility.Visible;
+                    txtBlkWarning.Text = "Number of students has to be between 1 and 10";
+                }
+
+            }
+            else
+            {
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "Please Enter Numbers Only MAX of 10 students";
+
+            }
+            int res2;
+            if (Int32.TryParse(txtbxNumbAssignments.Text, out res2) == true)
+            {
+                if (res2 > 0 && res2 <= 99)
+                {
+                    numberOfAssignments = res2;
+                    lblEnterAssignNumb.Content = "Enter Assignment Number (1 - " + numberOfAssignments + ")";
+                    if (numberOfStudentsIsSet == true)
+                    {
+
+                        fieldsAreEnabled(true);
+                        populateStudentArray();
+                        populateAssignmentArray();
+             
+                        
+                    }
+                }
+                else
+                {
+                    //display popup warning number of assignments has to be between 0 and 99
+                    txtBlkWarning.Visibility = Visibility.Visible;
+                    txtBlkWarning.Text = "Number of assignments has to be between 0 and 99";
+                }
+            }
+            else
+            {
+                //display popup warning. Please Enter Numbers only MAX 99
+
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "Please Enter Numbers only MAX 99";
+            }
+        }
+
+
+        /// <summary>
+        /// takes true or false param and sets fields to enabled or disabled 
+        /// according to what actions are taken by the user.
+        /// </summary>
+        /// <param name="tf"></param>
+        private void fieldsAreEnabled(bool tf)
+        {
+            btnFirstStudent.IsEnabled = tf;
+            btnPrevStudent.IsEnabled = tf;
+            btnNextStudent.IsEnabled = tf;
+            btnLastStudent.IsEnabled = tf;
+            txtbxStudentName.IsEnabled = tf;
+            btnSaveStudentName.IsEnabled = tf;
+            txtbxEnterAssignmentNumber.IsEnabled = tf;
+            txtbxEnterAssignmentScore.IsEnabled = tf;
+            btnSaveScores.IsEnabled = tf;
+            btnDisplayScores.IsEnabled = tf;
+            btnResetCounts.IsEnabled = tf;
+            txtbxEnterAssignmentNumber.Text = "";
+            txtbxEnterAssignmentScore.Text = "";
+            //lblEnterAssignNumb.Content = "Enter Assignment Number (1 - X)";
+            lblStudentIndex.Content = "Student #1";
+            txtbxStudentName.Text = "";
+        }
+
+        /// <summary>
+        /// populates the student array with the correct string.
+        /// </summary>
+        public void populateStudentArray() {
+            int count = 0;
+            studentArray = new String[numberOfStudents];
+            for (int i = 0; i < numberOfStudents ; i++)
+            {
+                studentArray[i] = "Student #" + (count + 1);
+                count++;
+            }
+          
+
+        }
+
+        public void populateAssignmentArray()
+        {
+           int assNumb = 1;
+            assignmentArray = new int[numberOfAssignments, numberOfStudents];
+            for (int i = 0; i < numberOfAssignments; i++)
+            {
+                for (int j = 0; j < numberOfStudents; j++)
+                {
+                    assignmentArray[i, j] = 0;
+                }
+
+                assNumb++;
+            }
+        }
+
+        /// <summary>
+        /// btnFirstStudent will display the first students name in the txtbxStudent
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnFirstStudent_Click(object sender, RoutedEventArgs e)
+        {
+            if (indexOfCurrStudentDisplaying != 0) //so, if it's not already at the first student
+            {
+                indexOfCurrStudentDisplaying = 0;
+                lblStudentIndex.Content = studentArray[0];
+                //clear txtbx text
+                txtbxStudentName.Text = "";
+            }
+            else {
+
+            //display error : "already showing first student" or something
+            }
+        }
+
+        /// <summary>
+        /// btnPrevStudent will go to the student before the currently selected one in the array.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPrevStudent_Click(object sender, RoutedEventArgs e)
+        {
+            if (indexOfCurrStudentDisplaying != 0)
+            {
+                indexOfCurrStudentDisplaying = indexOfCurrStudentDisplaying - 1;
+                lblStudentIndex.Content = studentArray[indexOfCurrStudentDisplaying];
+                //clear txtbx text
+                txtbxStudentName.Text = "";
+            }
+            else {
+                //first student already displaying cannot go back any further in list
+            }
+        }
+        /// <summary>
+        /// btnNextStudent will go the the student after the currently selected one in the array
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnNextStudent_Click(object sender, RoutedEventArgs e)
+        {
+            if (indexOfCurrStudentDisplaying != numberOfStudents - 1)
+            {
+                indexOfCurrStudentDisplaying = indexOfCurrStudentDisplaying + 1;
+                lblStudentIndex.Content = studentArray[indexOfCurrStudentDisplaying];
+                //clear txtbx text
+                txtbxStudentName.Text = "";
+            }
+            else {
+                //already showing last one
+            }
+        }
+        /// <summary>
+        /// btnLastStudent will go to the last student in the array of students.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnLastStudent_Click(object sender, RoutedEventArgs e)
+        {
+            if (indexOfCurrStudentDisplaying != indexOfCurrStudentDisplaying - 1)
+            {
+
+                //clear txtbx text
+                txtbxStudentName.Text = "";
+                indexOfCurrStudentDisplaying = numberOfStudents - 1;
+                lblStudentIndex.Content = studentArray.Last();
+            }
+            else {
+                //display warning; "You're already at the end of the list of students"
+            }
+        }
+
+        /// <summary>
+        /// gets current student, and changes the assignment score for assignment number typed in.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnSaveScores_Click(object sender, RoutedEventArgs e)
+        {
+
+            /*  txtbxEnterAssignmentNumber;
+              txtbxEnterAssignmentScore;
+              indexOfCurrStudentDisplaying;*/
+            int res;
+            bool isAssignmentNumb = false;
+            if (Int32.TryParse(txtbxEnterAssignmentNumber.Text, out res) == true)
+            {
+                if (res > 0 && res <= numberOfAssignments)
+                {
+                    isAssignmentNumb = true;
+                }
+                else
+                {
+                    //display warning txt "Not an Assignment number"
+                }
+
+            }
+            else {
+                //"Has to be number"
+            }
+
+            int res2;
+            if (Int32.TryParse(txtbxEnterAssignmentScore.Text, out res2) == true)
+            {
+                if (res2 > 0 && res2 <= 100)
+                {
+                    if (isAssignmentNumb == true)
+                    {
+                        assignmentArray[res - 1,  indexOfCurrStudentDisplaying] = res2;
+                    }
+                }
+                else
+                {
+
+                    //display warning "Assignment scores are between 1 and 100"
+                }
+
+            }
+            else {
+
+                //has to be number
+            }
+            }
+
+
+
+
+        /// <summary>
+        /// resets arrays to original state 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            populateAssignmentArray();
+            populateStudentArray();
+            indexOfCurrStudentDisplaying = 0;
+            numberOfStudents = 0;
+            numberOfAssignments = 0;
+            richTextBox.Document.Blocks.Clear();
+            fieldsAreEnabled(false);
+            //set all labels to disabled;
+        }
+
+
+        /// <summary>
+        /// change and save students name in student array
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnSaveStudentName_Click(object sender, RoutedEventArgs e)
+        {
+            //don't need to check for numbers or letters, names can be anything
+            studentArray[indexOfCurrStudentDisplaying] = txtbxStudentName.Text;
+            lblStudentIndex.Content = txtbxStudentName.Text;
+        }
+
+
+        /// <summary>
+        /// gathers data from both arrays and displays information and calculates the average and grade for each student
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnDisplayScores_Click(object sender, RoutedEventArgs e)
+        {
+            FlowDocument myFlowDoc = new FlowDocument();
+            Paragraph myParagraph = new Paragraph();
+            Run top = new Run("STUDENT\t");
+            for (int i = 0; i < numberOfAssignments; i++)
+            {
+                if (i == 0)
+                    myParagraph.Inlines.Add("STUDENT\t");
+                myParagraph.Inlines.Add("#" + (i + 1) + "\t");
+            }
+            myParagraph.Inlines.Add("AVG\tGRADE");
+            myParagraph.Inlines.Add(Environment.NewLine);
+            for (int i = 0; i < numberOfStudents; i++)
+            {
+                Run newStudent = new Run();
+                myParagraph.Inlines.Add(studentArray[i] + "\t\t");
+                double avg = 0;
+                for (int j = 0; j < numberOfAssignments; j++)
+                {
+                    myParagraph.Inlines.Add(assignmentArray[j, i] + "\t");
+                    avg += assignmentArray[j, i];
+                    if (j == numberOfAssignments - 1) {
+                        avg = (avg / numberOfAssignments);
+                        String letterGrade = getLetterGrade(avg);
+                        myParagraph.Inlines.Add(Math.Round(avg, 2) + "\t" + letterGrade);
+                    }
+                   
+                }
+
+                myParagraph.Inlines.Add(Environment.NewLine);
+            }
+
+
+            myFlowDoc.Blocks.Add(myParagraph);
+            richTextBox.Document = myFlowDoc;
+
+        }
+        /// <summary>
+        /// determine letter grade and passes it back
+        /// </summary>
+        /// <param name="avg"></param>
+        /// <returns></returns>
+        private string getLetterGrade(double avg)
+        {
+            if (avg <= 100 && avg >= 93)
+            {
+                return "A";
+            }
+            if (avg <= 92.9 && avg >= 90)
+            {
+                return "A-";
+            }
+            if (avg <= 89.9 && avg >= 87)
+            {
+                return "B+";
+            }
+            if (avg <= 86.9 && avg > 83)
+            {
+                return "B";
+            }
+            if (avg <= 82.9 && avg >= 80)
+            {
+                return "B-";
+            }
+            if (avg <= 79.9 && avg >= 77)
+            {
+                return "C+";
+            }
+             if (avg <= 76.9 && avg >= 73)
+            {
+                return "C";
+            }
+            if (avg <= 72.9 && avg >= 70)
+            {
+                return "C-";
+            }
+            if (avg <= 69.9 && avg >= 67)
+            {
+                return "D+";
+            }
+             if (avg <= 66.9 && avg >= 63)
+            {
+                return "D";
+            }
+             if (avg <= 62.99 && avg >= 60)
+            {
+                return "D-";
+            }
+            else {
+
+                return "E";
+            }
+        }
+    }
+}
