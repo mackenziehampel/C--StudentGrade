@@ -21,10 +21,25 @@ namespace A3_StudentScores_MackenzieHampel
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// holds the number of students the user enters
+        /// </summary>
         private int numberOfStudents;
+        /// <summary>
+        /// holds the number of assignments the user enters
+        /// </summary>
         private int numberOfAssignments;
+        /// <summary>
+        /// holds an array of students 
+        /// </summary>
         private String[] studentArray;
+        /// <summary>
+        /// holds current index of the student the user is working with
+        /// </summary>
         private int indexOfCurrStudentDisplaying = 0;
+        /// <summary>
+        /// holds a 2d array of assignments and corresponding scores to the students. [assignment, studentScore]
+        /// </summary>
         private int[,] assignmentArray;
 
 
@@ -34,7 +49,7 @@ namespace A3_StudentScores_MackenzieHampel
             InitializeComponent();
             fieldsAreEnabled(false);
             richTextBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-
+            txtBlkWarning.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
@@ -97,8 +112,6 @@ namespace A3_StudentScores_MackenzieHampel
             }
             else
             {
-                //display popup warning. Please Enter Numbers only MAX 99
-
                 txtBlkWarning.Visibility = Visibility.Visible;
                 txtBlkWarning.Text = "Please Enter Numbers only MAX 99";
             }
@@ -125,7 +138,6 @@ namespace A3_StudentScores_MackenzieHampel
             btnResetCounts.IsEnabled = tf;
             txtbxEnterAssignmentNumber.Text = "";
             txtbxEnterAssignmentScore.Text = "";
-            //lblEnterAssignNumb.Content = "Enter Assignment Number (1 - X)";
             lblStudentIndex.Content = "Student #1";
             txtbxStudentName.Text = "";
         }
@@ -141,8 +153,6 @@ namespace A3_StudentScores_MackenzieHampel
                 studentArray[i] = "Student #" + (count + 1);
                 count++;
             }
-          
-
         }
 
         public void populateAssignmentArray()
@@ -173,10 +183,11 @@ namespace A3_StudentScores_MackenzieHampel
                 lblStudentIndex.Content = studentArray[0];
                 //clear txtbx text
                 txtbxStudentName.Text = "";
+                txtBlkWarning.Visibility = Visibility.Hidden;
             }
             else {
-
-            //display error : "already showing first student" or something
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "already showing first student";
             }
         }
 
@@ -193,9 +204,11 @@ namespace A3_StudentScores_MackenzieHampel
                 lblStudentIndex.Content = studentArray[indexOfCurrStudentDisplaying];
                 //clear txtbx text
                 txtbxStudentName.Text = "";
+                txtBlkWarning.Visibility = Visibility.Hidden;
             }
             else {
-                //first student already displaying cannot go back any further in list
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "already showing first student";
             }
         }
         /// <summary>
@@ -211,9 +224,12 @@ namespace A3_StudentScores_MackenzieHampel
                 lblStudentIndex.Content = studentArray[indexOfCurrStudentDisplaying];
                 //clear txtbx text
                 txtbxStudentName.Text = "";
+                txtBlkWarning.Visibility = Visibility.Hidden;
             }
             else {
-                //already showing last one
+
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "already showing last student";
             }
         }
         /// <summary>
@@ -225,14 +241,15 @@ namespace A3_StudentScores_MackenzieHampel
         {
             if (indexOfCurrStudentDisplaying != indexOfCurrStudentDisplaying - 1)
             {
-
                 //clear txtbx text
                 txtbxStudentName.Text = "";
                 indexOfCurrStudentDisplaying = numberOfStudents - 1;
                 lblStudentIndex.Content = studentArray.Last();
+                txtBlkWarning.Visibility = Visibility.Hidden;
             }
             else {
-                //display warning; "You're already at the end of the list of students"
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "You're already at the end of the list of students";
             }
         }
 
@@ -254,15 +271,18 @@ namespace A3_StudentScores_MackenzieHampel
                 if (res > 0 && res <= numberOfAssignments)
                 {
                     isAssignmentNumb = true;
+                    txtBlkWarning.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    //display warning txt "Not an Assignment number"
+                    txtBlkWarning.Visibility = Visibility.Visible;
+                    txtBlkWarning.Text = "Enter numbers between 1 and " + numberOfAssignments;
                 }
 
             }
             else {
-                //"Has to be number"
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "Has to be a number";
             }
 
             int res2;
@@ -272,25 +292,24 @@ namespace A3_StudentScores_MackenzieHampel
                 {
                     if (isAssignmentNumb == true)
                     {
-                        assignmentArray[res - 1,  indexOfCurrStudentDisplaying] = res2;
+                        assignmentArray[res - 1, indexOfCurrStudentDisplaying] = res2;
+                        txtBlkWarning.Visibility = Visibility.Hidden;
                     }
+                  
                 }
                 else
                 {
-
-                    //display warning "Assignment scores are between 1 and 100"
+                    txtBlkWarning.Visibility = Visibility.Visible;
+                    txtBlkWarning.Text = "Assignment scores are between 1 and 100";
                 }
 
             }
             else {
-
-                //has to be number
+                txtBlkWarning.Visibility = Visibility.Visible;
+                txtBlkWarning.Text = "Incorrect input";
             }
             }
-
-
-
-
+        
         /// <summary>
         /// resets arrays to original state 
         /// </summary>
@@ -365,6 +384,7 @@ namespace A3_StudentScores_MackenzieHampel
             richTextBox.Document = myFlowDoc;
 
         }
+
         /// <summary>
         /// determine letter grade and passes it back
         /// </summary>
